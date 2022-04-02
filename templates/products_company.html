@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block content %}
+{% if current_user.is_authenticated %}
+    <a href="add_products" class="btn btn-secondary">Добавить продукт</a>
+{% endif %}
+<h1>Ваши продукты</h1>
+{% for item in products%}
+<div class="col-md6 border rounded">
+    <h2>{{item.title}}</h2>
+    <div>
+        {{item.description}}
+    </div>
+    <div>
+        Дата добавления - {{item.created_date}}, Цена - {{item.price}}
+    </div>
+</div>
+{% endfor %}
+{% endblock %}

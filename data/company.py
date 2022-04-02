@@ -18,7 +18,7 @@ class Company(SqlAlchemyBase, UserMixin, SerializerMixin):
     hashed_password = sqlalchemy.Column(sqlalchemy.String, nullable=True)
     created_date = sqlalchemy.Column(sqlalchemy.DateTime,
                                      default=datetime.datetime.now)
-    # news = orm.relation("News", back_populates='user')
+    products = orm.relation("Products", back_populates='company')
 
     def set_password(self, password):
         self.hashed_password = generate_password_hash(password)
