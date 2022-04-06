@@ -8,7 +8,7 @@ from flask import request
 from flask import make_response
 from flask import session
 import datetime
-from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required
+from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
 from forms.login import LoginForm
 from data.users import User
 from data.company import Company
@@ -25,7 +25,7 @@ login_manager.init_app(app)
 @login_manager.user_loader
 def load_user(user_id):
     db_sess = db_session.create_session()
-    return db_sess.query(User).get(user_id)
+    return db_sess.query(User).get(user_id) or db_sess.query(Company).get(user_id)
 
 
 @app.route('/register', methods=['GET', 'POST'])
@@ -80,26 +80,30 @@ def login():
     return render_template('login.html', title='Авторизация', form=form)
 
 
-@app.route('/profile')
-def profile():
-    logout_user()
-    return redirect("/register")
+@app.route('/')
+def main_page():
+    db_sess = db_session.create_session()
+    products = db_sess.query(Products)
+    return render_template('main_page.html', products=products)
 
 
 @app.route('/logout')
+@login_required
 def logout():
     logout_user()
     return redirect("/register")
 
 
 @app.route('/my_products')
+@login_required
 def my_products():
     db_sess = db_session.create_session()
-    products = db_sess.query(Products)
+    products = db_sess.query(Products).filter()
     return render_template("products_company.html", products=products)
 
 
-@app.route('/add_products',  methods=['GET', 'POST'])
+@app.route('/add_products', methods=['GET', 'POST'])
+@login_required
 def add_products():
     form = ProductForm()
     if form.validate_on_submit():
@@ -109,13 +113,18 @@ def add_products():
             description=form.description.data,
             price=form.price.data
         )
-        # current_user.news.append(news)
-        # db_sess.merge(current_user)
         db_sess.add(products)
         db_sess.commit()
         return redirect('/my_products')
     return render_template('add_products.html', title='Добавление новости',
                            form=form)
+
+
+@app.route('/profile')
+@login_required
+def profile():
+    return render_template('profile.html')
+
 
 def main():
     db_session.global_init("db/clients.db")
