@@ -12,7 +12,7 @@
         {{item.description}}
     </div>
     <div>
-        Дата добавления - {{item.created_date}}, Цена - {{item.price}}
+        Дата добавления - {{ item.created_date[0:10] }}, Цена - {{ item.price }}
     </div>
 </div>
 {% endfor %}

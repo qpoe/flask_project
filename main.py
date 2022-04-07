@@ -2,7 +2,7 @@ from flask import Flask
 from flask import render_template
 import json
 from flask import redirect
-from data import db_session
+from data import db_session, products_blueprint
 from forms.register import RegisterForm
 from flask import request
 from flask import make_response
@@ -11,7 +11,6 @@ import datetime
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
 from forms.login import LoginForm
 from data.users import User
-from data.company import Company
 from forms.product_form import ProductForm
 from data.product import Products
 
@@ -25,7 +24,7 @@ login_manager.init_app(app)
 @login_manager.user_loader
 def load_user(user_id):
     db_sess = db_session.create_session()
-    return db_sess.query(User).get(user_id) or db_sess.query(Company).get(user_id)
+    return db_sess.query(User).get(user_id)
 
 
 @app.route('/register', methods=['GET', 'POST'])
@@ -45,22 +44,17 @@ def reqister():
             return render_template('register.html', title='Регистрация',
                                    form=form,
                                    message="Такой пользователь уже есть")
-        if form.company.data is False:
-            user = User(
-                login=form.name.data,
-                email=form.email.data
-            )
-            user.set_password(form.password.data)
-            db_sess.add(user)
-            db_sess.commit()
-        elif form.company.data is True:
-            company = Company(
-                company=form.name.data,
-                email=form.email.data
-            )
-            company.set_password(form.password.data)
-            db_sess.add(company)
-            db_sess.commit()
+        user = User(
+            login=form.name.data,
+            email=form.email.data,
+            is_company=form.company.data
+        )
+        user.set_password(form.password.data)
+        db_sess.add(user)
+        db_sess.commit()
+        user.set_password(form.password.data)
+        db_sess.add(user)
+        db_sess.commit()
         return redirect('/login')
     return render_template('register.html', title='Регистрация', form=form)
 
@@ -81,6 +75,7 @@ def login():
 
 
 @app.route('/')
+@app.route('/main_page')
 def main_page():
     db_sess = db_session.create_session()
     products = db_sess.query(Products)
@@ -111,7 +106,10 @@ def add_products():
         products = Products(
             title=form.title.data,
             description=form.description.data,
-            price=form.price.data
+            city=form.city.data,
+            price=form.price.data,
+            company_id=current_user.id,
+            created_date=str(datetime.datetime.now())
         )
         db_sess.add(products)
         db_sess.commit()
@@ -128,6 +126,7 @@ def profile():
 
 def main():
     db_session.global_init("db/clients.db")
+    app.register_blueprint(products_blueprint.blueprint)
     app.run(port=8080, host='127.0.0.1')
 
 
