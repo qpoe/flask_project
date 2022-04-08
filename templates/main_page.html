@@ -1,19 +1,19 @@
 {% extends "base.html" %}
 
 {% block content %}
-        <form class="d-flex">
-          <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
-          <button class="btn btn-outline-success" type="submit">Search</button>
-        </form>
-      <div class="container">
-        <div class="row">
-            {% for i in products %}
-            <div class="col-md-4">
+<form class="d-flex">
+    <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+    <button class="btn btn-outline-success" type="submit">Search</button>
+</form>
+<div class="container">
+    <div class="row">
+        {% for i in products %}
+        <div class="col-md-4">
             <h2>{{ i.title }}</h2>
             <p> {{ i.description }} </p>
-            <p><a class="btn btn-secondary" href="#" role="button">View details &raquo;</a></p>
-          </div>
-            {% endfor %}
+            <p><a class="btn btn-secondary" href="/products/{{ i.id }}" role="button">Смотреть детали &raquo;</a></p>
         </div>
-      </div>
+        {% endfor %}
+    </div>
+</div>
 {% endblock %}

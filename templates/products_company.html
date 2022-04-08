@@ -2,7 +2,7 @@
 
 {% block content %}
 {% if current_user.is_authenticated %}
-    <a href="add_products" class="btn btn-secondary">Добавить продукт</a>
+<a href="add_products" class="btn btn-secondary">Добавить продукт</a>
 {% endif %}
 <h1>Ваши продукты</h1>
 {% for item in products%}
@@ -12,7 +12,7 @@
         {{item.description}}
     </div>
     <div>
-        Дата добавления - {{ item.created_date[0:10] }}, Цена - {{ item.price }}
+        Цена - {{ item.price }}
     </div>
 </div>
 {% endfor %}

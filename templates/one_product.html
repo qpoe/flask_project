@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block content %}
+<p><h1>{{ products.title }}</h1><p>
+<div>
+    <p>Описание: {{ products.description }}
+    <p>
+</div>
+<div>
+    <p>Город: {{ products.city }}
+    <p>
+</div>
+<div>
+    <p>Дата добавления: {{ products.created_date[0:10] }}
+    <p>
+</div>
+<div>
+    <p>Продавец: {{ users.login }}
+    <p>
+</div>
+<div>
+    <p><h5>Цена: {{ products.price }} тг</h5>
+    <p>
+</div>
+{% if current_user.is_company != True %}
+<div><a class="btn btn-success" href="/add_to_basket">Купить</a></div>
+{% endif %}
+{% endblock %}

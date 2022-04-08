@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Ваши покупки</h1>
+{% for item in buyings%}
+<div class="col-md6 border rounded">
+    <h2>{{item.title}}</h2>
+    <div>
+        Купили - {{item.created_date}}
+    </div>
+</div>
+{% endfor %}
+{% endblock %}

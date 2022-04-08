@@ -1,6 +1,10 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <a href="/my_products" class="btn btn-success my-2">Мои продукты</a>
-    <a href="/logout" class="btn btn-success my-2">Выйти</a>
+{% if users.is_company != True %}
+<a href="/buyings" class="btn btn-success my-2">Мои покупки</a>
+{% else %}
+<a href="/my_products" class="btn btn-success my-2">Мои продукты</a>
+{% endif %}
+<a href="/logout" class="btn btn-success my-2">Выйти</a>
 {% endblock %}

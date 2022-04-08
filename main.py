@@ -1,18 +1,16 @@
 from flask import Flask
 from flask import render_template
-import json
 from flask import redirect
-from data import db_session, products_blueprint
+from data import db_session, products_blueprint, profile_blueprint
 from forms.register import RegisterForm
-from flask import request
-from flask import make_response
-from flask import session
 import datetime
-from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
+from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 from forms.login import LoginForm
 from data.users import User
 from forms.product_form import ProductForm
 from data.product import Products
+from data.buy import Buy
+from data.products_blueprint import product_list
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
@@ -93,13 +91,17 @@ def logout():
 @login_required
 def my_products():
     db_sess = db_session.create_session()
-    products = db_sess.query(Products).filter()
+    products = db_sess.query(Products).filter(Products.company_id == current_user.id)
+    if not current_user.is_company:
+        return render_template("deny.html")
     return render_template("products_company.html", products=products)
 
 
 @app.route('/add_products', methods=['GET', 'POST'])
 @login_required
 def add_products():
+    if not current_user.is_company:
+        return render_template("deny.html")
     form = ProductForm()
     if form.validate_on_submit():
         db_sess = db_session.create_session()
@@ -114,19 +116,40 @@ def add_products():
         db_sess.add(products)
         db_sess.commit()
         return redirect('/my_products')
-    return render_template('add_products.html', title='Добавление новости',
+    return render_template('add_products.html', title='Добавление продуктов',
                            form=form)
 
 
-@app.route('/profile')
+@app.route('/add_to_basket')
 @login_required
-def profile():
-    return render_template('profile.html')
+def add_to_basket():
+    if current_user.is_company:
+        return render_template("deny.html")
+    db_sess = db_session.create_session()
+    buyings = Buy(
+        title=product_list[0],
+        created_date=product_list[1],
+        user_id=current_user.id,
+    )
+    db_sess.add(buyings)
+    db_sess.commit()
+    return render_template("success_buy.html")
+
+
+@app.route('/buyings')
+@login_required
+def buyings():
+    if current_user.is_company:
+        return render_template("deny.html")
+    db_sess = db_session.create_session()
+    buyings = db_sess.query(Buy).filter(Buy.user_id == current_user.id)
+    return render_template("buying.html", buyings=buyings)
 
 
 def main():
     db_session.global_init("db/clients.db")
     app.register_blueprint(products_blueprint.blueprint)
+    app.register_blueprint(profile_blueprint.blueprint)
     app.run(port=8080, host='127.0.0.1')
 
 
