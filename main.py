@@ -11,6 +11,7 @@ from forms.product_form import ProductForm
 from data.product import Products
 from data.buy import Buy
 from data.products_blueprint import product_list
+from flask import request
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
@@ -42,6 +43,10 @@ def reqister():
             return render_template('register.html', title='Регистрация',
                                    form=form,
                                    message="Такой пользователь уже есть")
+        if len(form.password.data) < 8:
+            return render_template('register.html', title='Регистрация',
+                                   form=form,
+                                   message="Пароль содержит меньше 8 символов")
         user = User(
             login=form.name.data,
             email=form.email.data,
@@ -75,8 +80,14 @@ def login():
 @app.route('/')
 @app.route('/main_page')
 def main_page():
+    search = request.args.get('search')
     db_sess = db_session.create_session()
-    products = db_sess.query(Products)
+    if search:
+        products = db_sess.query(Products).filter(Products.title.contains(search) |
+                                                  Products.description.contains(search) |
+                                                  Products.price.contains(search))
+    else:
+        products = db_sess.query(Products)
     return render_template('main_page.html', products=products)
 
 
