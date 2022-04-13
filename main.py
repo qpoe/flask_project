@@ -12,6 +12,7 @@ from data.product import Products
 from data.buy import Buy
 from data.products_blueprint import product_list
 from flask import request
+import os
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
@@ -161,7 +162,8 @@ def main():
     db_session.global_init("db/clients.db")
     app.register_blueprint(products_blueprint.blueprint)
     app.register_blueprint(profile_blueprint.blueprint)
-    app.run(port=8080, host='127.0.0.1')
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host='0.0.0.0', port=port)
 
 
 if __name__ == '__main__':
