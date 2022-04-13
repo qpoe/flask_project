@@ -48,6 +48,18 @@ def reqister():
             return render_template('register.html', title='Регистрация',
                                    form=form,
                                    message="Пароль содержит меньше 8 символов")
+        if form.password.data.isdigit():
+            return render_template('register.html', title='Регистрация',
+                                   form=form,
+                                   message="Пароль должен содержать буквы")
+        if form.password.data.isalpha():
+            return render_template('register.html', title='Регистрация',
+                                   form=form,
+                                   message="Пароль должен содержать цифры")
+        if form.password.data.isalnum():
+            return render_template('register.html', title='Регистрация',
+                                   form=form,
+                                   message="Пароль должен содержать специальные символы")
         user = User(
             login=form.name.data,
             email=form.email.data,
